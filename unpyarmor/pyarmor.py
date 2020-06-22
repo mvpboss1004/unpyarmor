@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: GPL-3.0+
+# PyArmor file format
+
+import struct
+
+class Armored:
+    py_ver = ()
+    code = b""
+    
+def parse_armored(enc):
+    assert enc[:7] == b"PYARMOR"
+    py_major = enc[9]
+    py_minor = enc[10]
+    py_ver = (py_major, py_minor)
+    code_start = struct.unpack("<I", enc[28:32])[0]
+    code_length = struct.unpack("<I", enc[32:36])[0]
+    code = enc[code_start:code_start+code_length]
+    # TODO: find out what the other fields mean
+    dec = Armored()
+    dec.py_ver = py_ver
+    dec.code = code
+    return dec
