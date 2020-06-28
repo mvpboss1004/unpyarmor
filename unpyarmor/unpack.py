@@ -79,10 +79,8 @@ def decrypt_code_jump(code, flags, pubkey):
     enc = code[2:-8] # Remove stub
     if flags & 0x40000000: # obf_code == 1
         code = xor_decrypt(keys[2][0], enc)
-        code = fix_code(code, 2)
     elif flags & 0x8000000: # obf_code == 2
         code = des3_decrypt(keys[1][0], keys[1][1], enc)
-        code = fix_code(code, 2)
     return code
 
 def deobfusc_codeobj(co, pubkey):
