@@ -10,9 +10,6 @@ import dis
 
 from .crypto import *
 
-# Pattern to match the wrapped stub
-WRAP_CODE = bytes.fromhex("7112090009005700350009000900")
-
 def parse_key(keyi):
     # Decrypt the pytransform.key to the RSA public key
     r = BytesIO(keyi)
@@ -99,10 +96,12 @@ def deobfusc_codeobj(co, pubkey):
             const = deobfusc_codeobj(const, pubkey)
         consts.append(const)
     if flags & 0x48000000:
-        if code[:len(WRAP_CODE)] == WRAP_CODE: # wrap_mode == 1
+        if "__armor_enter__" in co.co_names and "__armor_exit__" in co.co_names: # wrap_mode == 1
             code = decrypt_code_wrap(co.co_code, flags, pubkey)
-        else: # wrap_mode == 0
+        elif "__armor__" in co.co_names: # wrap_mode == 0
             code = decrypt_code_jump(co.co_code, flags, pubkey)
+        else:
+            print("warning: could not detect stub in", co)
     # remove obfuscation flags
     # note: 0x20000000 means allow external usage
     flags &= ~(0x40000000 | 0x20000000 | 0x8000000)
