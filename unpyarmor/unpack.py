@@ -76,7 +76,13 @@ def decrypt_code_wrap(code, flags, pubkey):
 def decrypt_code_jump(code, flags, pubkey):
     # Decrypt code with wrap disabled
     keys = derive_keys(pubkey)
-    enc = code[2:-8] # Remove stub
+    # search for jump at end of stub
+    stub_size = 2
+    for i in range(0, len(code), 2):
+        if code[i] == 110: # JUMP_FORWARD
+            stub_size = i+2
+            break
+    enc = code[stub_size:-8] # Remove stub
     if flags & 0x40000000: # obf_code == 1
         code = xor_decrypt(keys[2][0], enc)
     elif flags & 0x8000000: # obf_code == 2
