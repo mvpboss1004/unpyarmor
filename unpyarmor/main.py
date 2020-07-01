@@ -6,14 +6,16 @@ import marshal
 from .unpack import *
 from .pyarmor import *
 
-PYC_HEADER = bytes.fromhex("550d0d0a000000000000000000000000")
-
 def unpack(enc, key):
     pubkey = parse_key(key)
     armor = parse_armored(enc)
+    # Make sure the python version matches
+    python_ver = (sys.version_info.major, sys.version_info.minor)
+    if armor.py_ver != python_ver:
+        print("You are using python {}, but this script was packed with {}, expect errors!".format(python_ver, armor.py_ver))
     co = restore_codeobj(armor.code, pubkey)
     co = deobfusc_codeobj(co, pubkey)
-    pyc_data = PYC_HEADER + marshal.dumps(co)
+    pyc_data = armor.import_magic.ljust(16, b"\x00") + marshal.dumps(co)
     return pyc_data
 
 def main():

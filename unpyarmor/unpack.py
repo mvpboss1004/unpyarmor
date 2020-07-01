@@ -64,25 +64,33 @@ def fix_code(code, stub_size):
 def decrypt_code_wrap(code, flags, pubkey):
     # Decrypt code with wrap enabled
     keys = derive_keys(pubkey)
-    enc = code[32:-16] # Remove stub
+    # remove stub (different versions have different size stubs,
+    # these are actually hardcoded into pyarmor)
+    if sys.hexversion < 0x3080000: # 3.7
+        sbeg, send = 16, 16
+    elif sys.hexversion < 0x3090000: # 3.8
+        sbeg, send = 32, 16
+    else:
+        print("Strange python version {}?".format(hex(sys.hexversion)))
+    enc = code[sbeg:-send]
     if flags & 0x40000000: # obf_code == 1
         code = xor_decrypt(keys[2][0], enc)
-        code = fix_code(code, 32)
+        code = fix_code(code, sbeg)
     elif flags & 0x8000000: # obf_code == 2
         code = des3_decrypt(keys[0][0], keys[0][1], enc)
-        code = fix_code(code, 32)
+        code = fix_code(code, sbeg)
     return code
 
 def decrypt_code_jump(code, flags, pubkey):
     # Decrypt code with wrap disabled
     keys = derive_keys(pubkey)
-    # search for jump at end of stub
-    stub_size = 2
+    # Calculate the start offset
+    code_start = 0
     for i in range(0, len(code), 2):
         if code[i] == 110: # JUMP_FORWARD
-            stub_size = i+2
+            code_start = i+2
             break
-    enc = code[stub_size:-8] # Remove stub
+    enc = code[code_start:-8] # Remove stub
     if flags & 0x40000000: # obf_code == 1
         code = xor_decrypt(keys[2][0], enc)
     elif flags & 0x8000000: # obf_code == 2
@@ -109,5 +117,14 @@ def deobfusc_codeobj(co, pubkey):
     # remove obfuscation flags
     # note: 0x20000000 means allow external usage
     flags &= ~(0x40000000 | 0x20000000 | 0x8000000)
-    co = co.replace(co_code=code, co_flags=flags, co_consts=tuple(consts))
+    # change the code and flags of the code object to the deobfuscated version
+    if sys.hexversion < 0x3080000:
+        code_c = type(co)
+        co = code_c(co.co_argcount, co.co_kwonlyargcount, co.co_nlocals,
+            co.co_stacksize, flags, code, tuple(consts), co.co_names,
+            co.co_varnames, co.co_filename, co.co_name, co.co_firstlineno,
+            co.co_lnotab, co.co_freevars, co.co_cellvars)
+    else:
+        # 3.8 changed some code object fields and added 'replace'
+        co = co.replace(co_code=code, co_flags=flags, co_consts=tuple(consts))
     return co
