@@ -9,7 +9,8 @@ class Armored:
     code = b""
     
 def parse_armored(enc):
-    assert enc[:7] == b"PYARMOR"
+    if enc[:7] != b"PYARMOR":
+        raise Exception("Invalid magic")
     py_major = enc[9]
     py_minor = enc[10]
     py_ver = (py_major, py_minor)

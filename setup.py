@@ -24,7 +24,8 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        "pycrypto"
+        "pycrypto",
+        "click"
     ],
     python_requires='>=3.6',
 )
