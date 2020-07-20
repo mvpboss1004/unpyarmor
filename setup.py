@@ -24,7 +24,7 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        "pycrypto",
+        "pycryptodome",
         "click"
     ],
     python_requires='>=3.6',
