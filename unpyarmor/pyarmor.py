@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0+
 # PyArmor file format
 
 import struct

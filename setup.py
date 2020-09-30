@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="unpyarmor",
     version="0.1",
-    author="Nayil Mukhametshin",
-    author_email="me@nayilm.com",
+    author="nslcc",
+    author_email="dontsendmailhere@example.com",
     description="Deobfuscator / unpacker for PyArmor",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -15,7 +15,7 @@ setuptools.setup(
     packages=["unpyarmor"],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "License :: License :: Public Domain",
         "Operating System :: OS Independent",
     ],
     entry_points={

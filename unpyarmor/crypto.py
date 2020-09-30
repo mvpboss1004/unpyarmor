@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: GPL-3.0+
 # Decryption functions
 
 from Crypto.Cipher import DES3
