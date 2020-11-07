@@ -7,7 +7,7 @@ from io import BytesIO
 
 import dis
 
-from .crypto import *
+from crypto import *
 
 def parse_key(keyi):
     # Decrypt the pytransform.key to the RSA public key

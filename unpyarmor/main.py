@@ -1,10 +1,7 @@
 import sys
 import marshal
-
-import click
-
-from .unpack import *
-from .pyarmor import *
+from unpack import *
+from pyarmor import *
 
 def do_unpack(enc_data, key_data):
     pubkey = parse_key(key_data)
@@ -18,14 +15,9 @@ def do_unpack(enc_data, key_data):
     pyc_data = armor.import_magic.ljust(16, b"\x00") + marshal.dumps(co)
     return pyc_data
 
-@click.group()
 def main():
-    pass
+    unpack(sys.argv[1], sys.argv[2], sys.argv[3]
 
-@main.command()
-@click.argument("enc")
-@click.argument("key")
-@click.argument("pyc_out")
 def unpack(enc, key, pyc_out):
     with open(enc, "rb") as fd:
         enc = fd.read()
@@ -34,3 +26,6 @@ def unpack(enc, key, pyc_out):
     dec = do_unpack(enc, key)
     with open(pyc_out, "wb") as fd:
         fd.write(dec)
+
+if __name__ == '__main__':
+    main()
